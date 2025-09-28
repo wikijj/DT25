@@ -1,33 +1,41 @@
-<h2>Product List</h2>
-<table>
-    <thead>
-        <tr>
-            <th>ID</th>
-            <th>Node</th>
-            <th>Product Name</th>
-            <th>Description</th>
-            <th>Quantity</th>
-            <th>Price (€)</th>
-            <th>Size</th>
-            <th>Color</th>
-            <th>Product Code</th>
-            <th>Created At</th>
-        </tr>
-    </thead>
-    <tbody>
-        <?php foreach ($rows as $row): ?>
+
+    <h2>Zoznam produktov</h2>
+    <table>
+        <thead>
             <tr>
-                <td><?php echo htmlspecialchars($row['id']); ?></td>
-                <td><?php echo htmlspecialchars($row['node_id']); ?></td>
-                <td><?php echo htmlspecialchars($row['title']); ?></td>
-                <td><?php echo htmlspecialchars($row['description']); ?></td>
-                <td><?php echo htmlspecialchars($row['quantity']); ?></td>
-                <td><?php echo number_format($row['price'], 2); ?></td>
-                <td><?php echo htmlspecialchars($row['size']); ?></td>
-                <td><?php echo htmlspecialchars($row['color']); ?></td>
-                <td><?php echo htmlspecialchars($row['product_code']); ?></td>
-                <td><?php echo htmlspecialchars($row['created_at']); ?></td>
+                <th>ID</th>
+                <th>Node</th>
+                <th>Produkt</th>
+                <th>Popis</th>
+                <th>Počet</th>
+                <th>Cena (€)</th>
+                <th>Veľkosť</th>
+                <th>Farba</th>
+                <th>Kód</th>
+                <th>Vytvorené</th>
             </tr>
-        <?php endforeach; ?>
-    </tbody>
-</table>
+        </thead>
+        <tbody>
+            <?php if (!empty($rows)): ?>
+                <?php foreach ($rows as $row): ?>
+                    <tr>
+                        <td><?= htmlspecialchars($row['id']) ?></td>
+                        <td><?= htmlspecialchars($row['node_id']) ?></td>
+                        <td><?= htmlspecialchars($row['title']) ?></td>
+                        <td><?= htmlspecialchars($row['description']) ?></td>
+                        <td><?= htmlspecialchars($row['quantity']) ?></td>
+                        <td><?= number_format($row['price'], 2) ?></td>
+                        <td><?= htmlspecialchars($row['size']) ?></td>
+                        <td><?= htmlspecialchars($row['color']) ?></td>
+                        <td><?= htmlspecialchars($row['product_code']) ?></td>
+                        <td><?= htmlspecialchars($row['created_at']) ?></td>
+                    </tr>
+                <?php endforeach; ?>
+            <?php else: ?>
+                <tr>
+                    <td colspan="10" style="text-align:center; opacity:0.8;">Žiadne produkty</td>
+                </tr>
+            <?php endif; ?>
+        </tbody>
+    </table>
+

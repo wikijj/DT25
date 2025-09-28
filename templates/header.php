@@ -7,9 +7,9 @@
 </head>
 <body>
 <header>
-    <div class="container">
+   
         <h1>Distribuovaný IS - Uzol <?php echo $node_id; ?></h1>
-    </div>
+    
 </header>
 <nav>
     <div class="container">
