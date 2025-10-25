@@ -101,7 +101,7 @@ form textarea {
 
 form input::placeholder,
 form textarea::placeholder {
-    color: #e0e0e0;
+    color: #e0e0e0a2;
 }
 
 form input:focus,
