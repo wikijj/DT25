@@ -88,7 +88,7 @@ form textarea {
     border-radius: 8px;
     background-color: rgba(255, 255, 255, 0.525);
     border: 1px solid var(--glass-border);
-    color: white;
+    color: rgb(22, 240, 121);
     font-size: 0.95rem;
     outline: none;
     transition: background-color 0.2s, border-color 0.2s;
