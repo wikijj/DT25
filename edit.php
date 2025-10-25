@@ -23,29 +23,30 @@ if (!$product) {
 
 // --- Uloženie zmien po odoslaní formulára ---
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $title = $_POST['title'];
-    $description = $_POST['description'];
     $quantity = $_POST['quantity'];
-    $price = $_POST['price'];
-    $size = $_POST['size'];
-    $color = $_POST['color'];
-    $product_code = $_POST['product_code'];
 
-    $stmt = $pdo->prepare("UPDATE records SET 
-        title = ?, 
-        description = ?, 
-        quantity = ?, 
-        price = ?, 
-        size = ?, 
-        color = ?, 
-        product_code = ?
-        WHERE id = ?");
-    $stmt->execute([$title, $description, $quantity, $price, $size, $color, $product_code, $id]);
+    if ($product['node_id'] != $node_id) {
+        // Cudzí uzol môže meniť len quantity
+        $stmt = $pdo->prepare("UPDATE records SET quantity = ? WHERE id = ?");
+        $stmt->execute([$quantity, $id]);
+    } else {
+        // Autor môže upraviť všetko
+        $title = $_POST['title'];
+        $description = $_POST['description'];
+        $price = $_POST['price'];
+        $size = $_POST['size'];
+        $color = $_POST['color'];
+        $product_code = $_POST['product_code'];
 
-    // Nastavenie hlášky do session
-    $_SESSION['message'] = "Produkt bol úspešne upravený!";
+        $stmt = $pdo->prepare("UPDATE records SET 
+            title = ?, description = ?, quantity = ?, price = ?, size = ?, color = ?, product_code = ?
+            WHERE id = ?");
+        $stmt->execute([$title, $description, $quantity, $price, $size, $color, $product_code, $id]);
+    }
 
-    header('Location: index.php?page=list');
+    // po úspešnom uložení zmien
+    $_SESSION['message'] = "Produkt bol úspešne upravený";
+    header("Location: index.php?page=list");
     exit;
 }
 ?>
@@ -56,26 +57,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <h2>Upraviť produkt</h2>
 
     <form method="POST" class="filter-form">
-        <label for="title">Názov produktu</label>
-        <input type="text" name="title" id="title" value="<?= htmlspecialchars($product['title']) ?>" required>
+        <?php if ($product['node_id'] == $node_id): ?>
+            <label for="title">Názov produktu</label>
+            <input type="text" name="title" id="title" value="<?= htmlspecialchars($product['title']) ?>" required>
 
-        <label for="description">Popis</label>
-        <textarea name="description" id="description" required><?= htmlspecialchars($product['description']) ?></textarea>
+            <label for="description">Popis</label>
+            <textarea name="description" id="description" required><?= htmlspecialchars($product['description']) ?></textarea>
+    
+            <label for="price">Cena (€)</label>
+            <input type="number" step="0.01" name="price" id="price" value="<?= htmlspecialchars($product['price']) ?>" required>
 
-        <label for="quantity">Počet</label>
-        <input type="number" name="quantity" id="quantity" value="<?= htmlspecialchars($product['quantity']) ?>" required>
+            <label for="size">Veľkosť</label>
+            <input type="text" name="size" id="size" value="<?= htmlspecialchars($product['size']) ?>">
 
-        <label for="price">Cena (€)</label>
-        <input type="number" step="0.01" name="price" id="price" value="<?= htmlspecialchars($product['price']) ?>" required>
+            <label for="color">Farba</label>
+            <input type="text" name="color" id="color" value="<?= htmlspecialchars($product['color']) ?>">
 
-        <label for="size">Veľkosť</label>
-        <input type="text" name="size" id="size" value="<?= htmlspecialchars($product['size']) ?>">
+            <label for="product_code">Kód produktu</label>
+            <input type="text" name="product_code" id="product_code" value="<?= htmlspecialchars($product['product_code']) ?>">
+        <?php endif; ?>
 
-        <label for="color">Farba</label>
-        <input type="text" name="color" id="color" value="<?= htmlspecialchars($product['color']) ?>">
-
-        <label for="product_code">Kód produktu</label>
-        <input type="text" name="product_code" id="product_code" value="<?= htmlspecialchars($product['product_code']) ?>">
+            <label for="quantity">Počet</label>
+            <input type="number" name="quantity" id="quantity" value="<?= htmlspecialchars($product['quantity']) ?>" required>
 
         <div class="center-btn">
             <button type="submit">💾 Uložiť zmeny</button>

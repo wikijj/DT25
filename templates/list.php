@@ -33,7 +33,9 @@
                             <!-- EDIT -->
                             <a href="edit.php?id=<?= $row['id'] ?>">✏️</a>
                             <!-- DELETE -->
-                            <a href="delete.php?id=<?= $row['id'] ?>" onclick="return confirm('Naozaj zmazať tento záznam?');">🗑️</a>
+                             <?php if ($row['node_id'] == $node_id): ?>
+                                <a href="delete.php?id=<?= $row['id'] ?>" onclick="return confirm('Naozaj zmazať tento záznam?');">🗑️</a>
+                            <?php endif; ?>
                         </td>
                     </tr>
                 <?php endforeach; ?>

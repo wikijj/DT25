@@ -51,7 +51,7 @@ footer {
     margin: 15px 0;
     padding: 10px;
     border-radius: 8px;
-    background: rgba(255,255,255,0.2);
+    background: rgba(94, 20, 242, 0.616);
     text-align: center;
     font-weight: bold;
 }
@@ -74,6 +74,7 @@ input, textarea {
     border: 1px solid rgba(255, 255, 255, 0.3);
     background: rgba(255,255,255,0.5);
     color: black;
+    font-family: Arial, sans-serif;
 }
 
 textarea {

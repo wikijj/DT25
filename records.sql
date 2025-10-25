@@ -35,7 +35,6 @@ CREATE TABLE IF NOT EXISTS `records` (
   `description` text,
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  `replicated` tinyint(1) DEFAULT '0',
   `quantity` int DEFAULT '0',
   `price` decimal(10,2) DEFAULT '0.00',
   `size` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
@@ -48,7 +47,7 @@ CREATE TABLE IF NOT EXISTS `records` (
 -- Sťahujem dáta pre tabuľku `records`
 --
 
-INSERT INTO `records` (`id`, `node_id`, `title`, `description`, `created_at`, `updated_at`, `replicated`, `quantity`, `price`, `size`, `color`, `product_code`) VALUES
+INSERT INTO `records` (`id`, `node_id`, `title`, `description`, `created_at`, `updated_at`, `quantity`, `price`, `size`, `color`, `product_code`) VALUES
 (3, 1, 'sukňa', 'Dlhá letná bodkovaná sukňa', '2025-09-28 18:28:51', '2025-09-28 18:28:51', 0, 3, 20.00, 'S', 'modrá', '1234');
 COMMIT;
 
