@@ -1,16 +1,7 @@
-:root {
-    --bg-gradient-from: #9183b3;
-    --bg-gradient-to: #7a8fb2;
-    --glass-bg: rgba(255, 255, 255, 0.2);
-    --glass-border: rgba(255, 255, 255, 0.3);
-    --glass-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
-
 body {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-    background: linear-gradient(135deg, var(--bg-gradient-from), var(--bg-gradient-to));
-    background-attachment: fixed;
-    color: rgba(255, 255, 255, 0.651);
+    font-family: Arial, sans-serif;
+    background: linear-gradient(135deg, #9183b3, #7a8fb2);
+    color: white;
     margin: 0;
     padding: 20px;
     min-height: 100vh;
@@ -19,20 +10,18 @@ body {
 /* ===== HEADER & NAV ===== */
 header, nav, footer {
     text-align: center;
-    margin-bottom: 1.5rem;
+    margin-bottom: 20px;
 }
 
 header h1 {
-    font-size: 1.875rem;
+    font-size: 28px;
     font-weight: bold;
 }
 
 nav a {
-    margin: 0 1rem;
+    margin: 0 10px;
     color: white;
     text-decoration: none;
-    font-weight: 500;
-    transition: opacity 0.2s;
 }
 
 nav a:hover {
@@ -40,8 +29,8 @@ nav a:hover {
 }
 
 footer {
-    margin-top: 2rem;
-    font-size: 0.875rem;
+    margin-top: 30px;
+    font-size: 14px;
     opacity: 0.9;
 }
 
@@ -49,116 +38,85 @@ footer {
 .container, .glass-card {
     max-width: 80%;
     margin: 0 auto;
-    backdrop-filter: blur(12px);
-    background-color: var(--glass-bg);
-    border: 1px solid var(--glass-border);
+    background: rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.3);
     border-radius: 12px;
-    box-shadow: var(--glass-shadow);
-    padding: 1rem;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    backdrop-filter: blur(10px);
+    padding: 15px;
 }
 
 /* ===== MESSAGES ===== */
 .message {
-    margin: 1rem 0;
-    padding: 0.75rem;
+    margin: 15px 0;
+    padding: 10px;
     border-radius: 8px;
-    background-color: rgba(255,255,255,0.2);
+    background: rgba(255,255,255,0.2);
     text-align: center;
-    font-weight: 500;
+    font-weight: bold;
 }
 
-/* ===== FORMS (upravené) ===== */
-form.filter-form {
+/* ===== FORMS ===== */
+form {
     display: flex;
     flex-direction: column;
-    gap: 1rem;
-    margin-top: 1rem;
+    gap: 10px;
 }
 
-form label {
-    font-size: 0.95rem;
-    font-weight: 500;
-    margin-bottom: 0.25rem;
+label {
+    font-weight: bold;
 }
 
-form input,
-form textarea {
-    width: 97%;
-    padding: 0.6rem;
+input, textarea {
+    width: 100%;
+    padding: 8px;
     border-radius: 8px;
-    background-color: rgba(255, 255, 255, 0.525);
-    border: 1px solid var(--glass-border);
-    color: rgb(0, 0, 0);
-    font-size: 0.95rem;
-    outline: none;
-    transition: background-color 0.2s, border-color 0.2s;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    background: rgba(255,255,255,0.5);
+    color: black;
 }
 
-form textarea {
+textarea {
     min-height: 80px;
-    resize: vertical;
 }
 
-form input::placeholder,
-form textarea::placeholder {
-    color: #e0e0e0;
+input:focus, textarea:focus {
+    background: rgba(255,255,255,0.4);
 }
-
-form input:focus,
-form textarea:focus {
-    background-color: rgba(255, 255, 255, 0.4);
-    border-color: rgba(255, 255, 255, 0.6);
-}
-
-.center-btn {
-    text-align: center;
-}
-
 
 button {
-    background-color: rgba(255, 255, 255, 0.2);
-    border: 1px solid var(--glass-border);
-    padding: 0.5rem 1.25rem;
+    background: rgba(255,255,255,0.2);
+    border: 1px solid rgba(255,255,255,0.3);
+    padding: 8px 20px;
     border-radius: 8px;
-    font-weight: 600;
-    font-size: 0.9rem;
     color: white;
     cursor: pointer;
-    transition: background-color 0.2s;
 }
 
 button:hover {
-    background-color: rgba(255, 255, 255, 0.3);
+    background: rgba(255,255,255,0.3);
 }
 
 /* ===== TABLE ===== */
 table {
     width: 100%;
-    border-collapse: separate;
-    border-spacing: 0;
-    margin-top: 1rem;
-}
-
-thead {
-    background-color: rgba(255, 255, 255, 0.15);
+    margin-top: 15px;
+    border-collapse: collapse;
 }
 
 th, td {
-    padding: 0.75rem 1rem;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 10px;
+    border-bottom: 1px solid rgba(255,255,255,0.2);
     text-align: left;
 }
 
 tr:hover {
-    background-color: rgba(255, 255, 255, 0.1);
+    background: rgba(255,255,255,0.1);
 }
 
 /* ===== RESPONSIVE ===== */
 @media (max-width: 768px) {
     .container, .glass-card {
         max-width: 95%;
-    }
-    form.filter-form {
-        grid-template-columns: 1fr;
     }
 }

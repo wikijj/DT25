@@ -29,6 +29,12 @@
                         <td><?= htmlspecialchars($row['color']) ?></td>
                         <td><?= htmlspecialchars($row['product_code']) ?></td>
                         <td><?= htmlspecialchars($row['created_at']) ?></td>
+                        <td>
+                            <!-- EDIT -->
+                            <a href="edit.php?id=<?= $row['id'] ?>">✏️</a>
+                            <!-- DELETE -->
+                            <a href="delete.php?id=<?= $row['id'] ?>" onclick="return confirm('Naozaj zmazať tento záznam?');">🗑️</a>
+                        </td>
                     </tr>
                 <?php endforeach; ?>
             <?php else: ?>

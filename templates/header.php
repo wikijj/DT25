@@ -1,3 +1,15 @@
+<?php
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+$message = '';
+if (!empty($_SESSION['message'])) {
+    $message = $_SESSION['message'];
+    unset($_SESSION['message']); // odstráni hlášku po zobrazení
+}
+?>
+
 <!DOCTYPE html>
 <html lang="sk">
 <head>
@@ -19,6 +31,6 @@
     </div>
 </nav>
 <div class="container">
-<?php if($message): ?>
-    <div class="message"><?php echo $message; ?></div>
+<?php if(!empty($message)): ?>
+    <div class="message"><?= htmlspecialchars($message) ?></div>
 <?php endif; ?>

@@ -1,10 +1,10 @@
 <?php
 $hostname = 'localhost';
-$database = 'distributed_db';   // názov tvojej DB
-$username = 'root';             // na WAMP je štandardne root
+$database = 'distributed_db';   // názov DB
+$username = 'root';             // ponechávame štandardný root
 $password = '';                 // prázdne heslo
 
-$node_id = 1;
+$node_id = 2;
 
 try {
     $pdo = new PDO("mysql:host=$hostname;dbname=$database;charset=utf8", $username, $password);
