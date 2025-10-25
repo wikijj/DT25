@@ -13,7 +13,7 @@
 </header>
 <nav>
     <div class="container">
-        <a href="?page=add">Pridať produkt</a>
+        <a href="?page=add">Pridať POKUS produkt</a>
         <a href="?page=list">Zobraziť databázu</a>
         <a href="?page=replicate">Synchronizovať záznamy</a>
     </div>
