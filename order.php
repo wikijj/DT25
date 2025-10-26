@@ -41,12 +41,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $total_price = $product['price'] * $quantity;
     $transaction_name = "Uzol{$node_id}_" . date("Y-m-d_H-i-s");
 
-    $stmt = $pdo->prepare("INSERT INTO transactions (transaction_name, product_id, quantity, total_price, node_id)
-                           VALUES (?, ?, ?, ?, ?)");
+// --- Vytvorenie transakcie ---
+    $stmt = $pdo->prepare("INSERT INTO transactions (transaction_name, product_id, quantity, total_price, node_id, needs_replication)
+                        VALUES (?, ?, ?, ?, ?, 1)");
     $stmt->execute([$transaction_name, $product_id, $quantity, $total_price, $node_id]);
+    $transaction_id = $pdo->lastInsertId();
 
-    $stmt = $pdo->prepare("UPDATE records SET quantity = quantity - ? WHERE id = ?");
+// --- Označiť transakciu na replikáciu v tabuľke transaction_replication ---
+    $stmt = $pdo->prepare("INSERT IGNORE INTO transaction_replication (transaction_id, node_id) VALUES (?, ?)");
+    $stmt->execute([$transaction_id, $node_id]);
+
+// --- Aktualizácia množstva produktu ---
+    $stmt = $pdo->prepare("UPDATE records SET quantity = quantity - ?, needs_replication = 1 WHERE id = ?");
     $stmt->execute([$quantity, $product_id]);
+
+// Označiť produkt ako needing replication
+    $stmt = $pdo->prepare("INSERT IGNORE INTO record_replication (record_id, node_id) VALUES (?, ?)");
+    $stmt->execute([$product_id, $node_id]);
 
     $_SESSION['message'] = "Objednávka bola úspešne spracovaná!";
     header("Location: ?page=list");

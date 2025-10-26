@@ -1,7 +1,34 @@
+<?php
+require 'db.php';
 
+// --- SPRACOVANIE PRIDANIA PRODUKTU ---
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add'])) {
+    $title = $_POST['title'];
+    $description = $_POST['description'];
+    $quantity = (int)$_POST['quantity'];
+    $price = (float)$_POST['price'];
+    $size = $_POST['size'];
+    $color = $_POST['color'];
+    $product_code = $_POST['product_code'];
+
+    // Vloženie do DB s označením needs_replication = 1
+    $stmt = $pdo->prepare(
+        "INSERT INTO records 
+            (node_id, title, description, quantity, price, size, color, product_code, needs_replication) 
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, 1)"
+    );
+    $stmt->execute([$node_id, $title, $description, $quantity, $price, $size, $color, $product_code]);
+
+    $_SESSION['message'] = "Produkt bol úspešne pridaný a bude replikovaný do ostatných uzlov.";
+    header("Location: ?page=list");
+    exit;
+}
+?>
+
+<div>
     <h2>Pridať nový produkt</h2>
+
     <form method="post" class="filter-form">
-        
         <div>
             <label for="title">Názov produktu</label>
             <input id="title" type="text" name="title" placeholder="Názov produktu" required>
@@ -41,3 +68,5 @@
             <button type="submit" name="add">Pridať produkt</button>
         </div>
     </form>
+</div>
+

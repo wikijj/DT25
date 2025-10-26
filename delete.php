@@ -23,11 +23,13 @@ if ($product['node_id'] != $node_id) {
     exit;
 }
 
-// Ak je autor, zmazať záznam
-$stmt = $pdo->prepare("DELETE FROM records WHERE id = ?");
+// Namiesto priameho DELETE nastavíme needs_replication = 1 a deleted_at
+$stmt = $pdo->prepare("UPDATE records 
+                       SET needs_replication = 1, deleted_at = NOW() 
+                       WHERE id = ?");
 $stmt->execute([$id]);
 
-$_SESSION['message'] = "Produkt bol vymazaný!";
+$_SESSION['message'] = "Produkt bol vymazaný a replikácia sa postará o odstránenie na ostatných uzloch!";
 header("Location: index.php?page=list");
 exit;
 ?>

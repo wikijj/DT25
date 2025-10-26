@@ -4,7 +4,7 @@ require 'db.php'; // pripojenie na DB
 // Zoznam všetkých uzlov v sieti (okrem tohto uzla)
 $other_nodes = [
     ['id'=>1,'url'=>'http://node1.local/DT25/replicate.php?receive=1'],
-    ['id'=>2,'url'=>'http://node2.local/DT25/replicate.php?receive=1'],
+//    ['id'=>2,'url'=>'http://node2.local/DT25/replicate.php?receive=1'],
     ['id'=>3,'url'=>'http://node3.local/DT25/replicate.php?receive=1'],
 ];
 
@@ -81,16 +81,16 @@ function replicateToNode($node, $data) {
     return $response === 'OK';
 }
 
-function replicateTransaction($pdo, $tx, $other_nodes, $node_id) {
-    foreach ($other_nodes as $node) {
-        if ($node['id'] == $node_id) continue;
-        $stmtCheck = $pdo->prepare("SELECT 1 FROM transaction_replication WHERE transaction_id=? AND node_id=?");
-        $stmtCheck->execute([$tx['id'], $node['id']]);
-        if ($stmtCheck->fetch()) continue;
-
-        if (replicateToNode($node, $tx)) {
-            $stmt = $pdo->prepare("INSERT IGNORE INTO transaction_replication (transaction_id, node_id) VALUES (?,?)");
-            $stmt->execute([$tx['id'], $node['id']]);
+function replicatePendingTransactions($pdo, $other_nodes, $node_id) {
+    $stmt = $pdo->query("SELECT * FROM transactions WHERE needs_replication=1 ORDER BY id ASC");
+    $transactions = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    foreach ($transactions as $tx) {
+        foreach ($other_nodes as $node) {
+            if ($node['id'] == $node_id) continue;
+            if (replicateToNode($node, $tx)) {
+                $stmtUpdate = $pdo->prepare("UPDATE transactions SET needs_replication=0 WHERE id=?");
+                $stmtUpdate->execute([$tx['id']]);
+            }
         }
     }
 }
@@ -120,6 +120,7 @@ function replicatePendingProducts($pdo, $other_nodes, $node_id) {
 $message = '';
 if (isset($_POST['replicate'])) {
     replicatePendingProducts($pdo, $other_nodes, $node_id);
+    replicatePendingTransactions($pdo, $other_nodes, $node_id);
     $message = "Replikácia záznamov dokončená.";
 }
 ?>

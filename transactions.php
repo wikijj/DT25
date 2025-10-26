@@ -1,15 +1,15 @@
 <?php
 require 'db.php'; // pripojenie na DB
 
-// --- Načítanie všetkých transakcií ---
+// --- Načítanie všetkých aktívnych transakcií ---
 $stmt = $pdo->query("
-    SELECT t.id, t.transaction_name, t.product_id, t.quantity, t.total_price, t.created_at, 
-           r.title AS product_name, r.description AS product_description
+    SELECT t.id, t.transaction_name, t.product_id, t.quantity, t.total_price, t.created_at, t.cancelled, r.title AS product_name
     FROM transactions t
     LEFT JOIN records r ON t.product_id = r.id
     ORDER BY t.created_at DESC
 ");
 $transactions = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
 
 ?>
 
@@ -41,6 +41,16 @@ $transactions = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         <td><?= htmlspecialchars($t['quantity']) ?></td>
                         <td><?= number_format($t['total_price'], 2) ?></td>
                         <td><?= htmlspecialchars($t['created_at']) ?></td>
+                        <td>
+                            <?php if (!$t['cancelled']): ?>
+                                <form method="post" action="storno.php" style="display:inline;">
+                                    <input type="hidden" name="transaction_id" value="<?= $t['id'] ?>">
+                                    <button type="submit" onclick="return confirm('Naozaj chcete stornovať túto objednávku?');">Storno</button>
+                                </form>
+                            <?php else: ?>
+                                <span style="color: red;">Stornované</span>
+                            <?php endif; ?>
+                        </td>
                     </tr>
                 <?php endforeach; ?>
             </tbody>

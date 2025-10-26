@@ -27,7 +27,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if ($product['node_id'] != $node_id) {
         // Cudzí uzol môže meniť len quantity
-        $stmt = $pdo->prepare("UPDATE records SET quantity = ? WHERE id = ?");
+        $stmt = $pdo->prepare("UPDATE records SET quantity = ?, needs_replication = 1 WHERE id = ?");
         $stmt->execute([$quantity, $id]);
     } else {
         // Autor môže upraviť všetko
@@ -39,12 +39,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $product_code = $_POST['product_code'];
 
         $stmt = $pdo->prepare("UPDATE records SET 
-            title = ?, description = ?, quantity = ?, price = ?, size = ?, color = ?, product_code = ?
+            title = ?, description = ?, quantity = ?, price = ?, size = ?, color = ?, product_code = ?, needs_replication = 1
             WHERE id = ?");
         $stmt->execute([$title, $description, $quantity, $price, $size, $color, $product_code, $id]);
     }
 
-    // po úspešnom uložení zmien
+    // --- Označenie záznamu na replikáciu ---
+    $stmt = $pdo->prepare("INSERT IGNORE INTO record_replication (record_id, node_id) VALUES (?, ?)");
+    $stmt->execute([$id, $node_id]);
+
     $_SESSION['message'] = "Produkt bol úspešne upravený";
     header("Location: index.php?page=list");
     exit;
@@ -77,8 +80,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <input type="text" name="product_code" id="product_code" value="<?= htmlspecialchars($product['product_code']) ?>">
         <?php endif; ?>
 
-            <label for="quantity">Počet</label>
-            <input type="number" name="quantity" id="quantity" value="<?= htmlspecialchars($product['quantity']) ?>" required>
+        <label for="quantity">Počet</label>
+        <input type="number" name="quantity" id="quantity" value="<?= htmlspecialchars($product['quantity']) ?>" required>
 
         <div class="center-btn">
             <button type="submit">💾 Uložiť zmeny</button>
