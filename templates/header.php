@@ -27,6 +27,8 @@ if (!empty($_SESSION['message'])) {
     <div class="container">
         <a href="?page=add">Pridať produkt</a>
         <a href="?page=list">Zobraziť databázu</a>
+        <a href="?page=order">Vytvoriť objednávku</a>
+        <a href="?page=transactions">Zobraziť prehľad objednávok</a>
         <a href="?page=replicate">Synchronizovať záznamy</a>
     </div>
 </nav>

@@ -12,7 +12,7 @@
                 <th>Veľkosť</th>
                 <th>Farba</th>
                 <th>Kód</th>
-                <th>Vytvorené</th>
+                <!--<th>Vytvorené</th>-->
             </tr>
         </thead>
         <tbody>
@@ -28,7 +28,7 @@
                         <td><?= htmlspecialchars($row['size']) ?></td>
                         <td><?= htmlspecialchars($row['color']) ?></td>
                         <td><?= htmlspecialchars($row['product_code']) ?></td>
-                        <td><?= htmlspecialchars($row['created_at']) ?></td>
+                        <!--<<td><?= htmlspecialchars($row['created_at']) ?></td>-->
                         <td>
                             <!-- EDIT -->
                             <a href="edit.php?id=<?= $row['id'] ?>">✏️</a>

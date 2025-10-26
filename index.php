@@ -31,7 +31,7 @@ if (isset($_POST['replicate'])) {
 
 // Load data for list view
 if ($page === 'list') {
-    $stmt = $pdo->query("SELECT * FROM records ORDER BY created_at DESC");
+    $stmt = $pdo->query("SELECT * FROM records ORDER BY id DESC");
     $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
 
@@ -45,7 +45,13 @@ switch($page) {
         include 'templates/list.php';
         break;
     case 'replicate':
-        include 'templates/replicate.php';
+        include 'replicate.php';
+        break;
+    case 'order':
+        include 'order.php';
+        break;
+    case 'transactions':
+        include 'transactions.php';
         break;
     default:
         include 'templates/add.php';
