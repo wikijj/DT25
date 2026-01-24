@@ -3,70 +3,91 @@ require 'db.php';
 
 // --- SPRACOVANIE PRIDANIA PRODUKTU ---
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add'])) {
-    $title = $_POST['title'];
-    $description = $_POST['description'];
-    $quantity = (int)$_POST['quantity'];
-    $price = (float)$_POST['price'];
-    $size = $_POST['size'];
-    $color = $_POST['color'];
+
+    $title        = $_POST['title'];
+    $description  = $_POST['description'];
+    $quantity     = (int)$_POST['quantity'];
+    $price        = (float)$_POST['price'];
+    $size         = $_POST['size'];
+    $color        = $_POST['color'];
     $product_code = $_POST['product_code'];
 
-    // Vloženie do DB s označením needs_replication = 1
-    $stmt = $pdo->prepare(
-        "INSERT INTO records 
-            (node_id, title, description, quantity, price, size, color, product_code, needs_replication) 
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, 1)"
-    );
-    $stmt->execute([$node_id, $title, $description, $quantity, $price, $size, $color, $product_code]);
+    // 1️⃣ Lokálny INSERT
+    $stmt = $pdo->prepare("
+        INSERT INTO products
+        (title, description, quantity, price, size, color, product_code, node_origin)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    ");
+    $stmt->execute([
+        $title,
+        $description,
+        $quantity,
+        $price,
+        $size,
+        $color,
+        $product_code,
+        $node_id
+    ]);
 
-    $_SESSION['message'] = "Produkt bol úspešne pridaný a bude replikovaný do ostatných uzlov.";
+    // 2️⃣ SQL pre replikáciu (ESCAPED!)
+    $sql = "
+        INSERT INTO products
+        (title, description, quantity, price, size, color, product_code, node_origin)
+        VALUES (
+            ".$pdo->quote($title).",
+            ".$pdo->quote($description).",
+            $quantity,
+            $price,
+            ".$pdo->quote($size).",
+            ".$pdo->quote($color).",
+            ".$pdo->quote($product_code).",
+            $node_id
+        )
+    ";
+
+    // zoznam uzlov
+    $nodes = [1, 2, 3];
+
+    foreach ($nodes as $target_node) {
+        if ($target_node != $node_id) {
+            $stmt = $pdo->prepare("
+                INSERT INTO replication_queue
+                (target_node, operation, sql_query)
+                VALUES (?, 'INSERT', ?)
+            ");
+            $stmt->execute([$target_node, $sql]);
+        }
+    }
+
+    $_SESSION['message'] = "Produkt bol pridaný a zaradený do replikácie.";
     header("Location: ?page=list");
     exit;
 }
 ?>
 
-<div>
-    <h2>Pridať nový produkt</h2>
+<h2>Pridať nový produkt</h2>
 
-    <form method="post" class="filter-form">
-        <div>
-            <label for="title">Názov produktu</label>
-            <input id="title" type="text" name="title" placeholder="Názov produktu" required>
-        </div>
+<form method="post">
+    <label>Názov produktu</label>
+    <input type="text" name="title" required>
 
-        <div>
-            <label for="description">Popis</label>
-            <textarea id="description" name="description" placeholder="Popis"></textarea>
-        </div>
+    <label>Popis</label>
+    <textarea name="description"></textarea>
 
-        <div>
-            <label for="quantity">Počet kusov</label>
-            <input id="quantity" type="number" name="quantity" placeholder="Počet ks" min="0" required>
-        </div>
+    <label>Počet kusov</label>
+    <input type="number" name="quantity" min="0" required>
 
-        <div>
-            <label for="price">Cena (€)</label>
-            <input id="price" type="number" name="price" placeholder="Cena" step="0.01" min="0" required>
-        </div>
+    <label>Cena (€)</label>
+    <input type="number" name="price" step="0.01" min="0" required>
 
-        <div>
-            <label for="size">Veľkosť</label>
-            <input id="size" type="text" name="size" placeholder="Veľkosť (napr. S, M, L, XL)">
-        </div>
+    <label>Veľkosť</label>
+    <input type="text" name="size">
 
-        <div>
-            <label for="color">Farba</label>
-            <input id="color" type="text" name="color" placeholder="Farba">
-        </div>
+    <label>Farba</label>
+    <input type="text" name="color">
 
-        <div>
-            <label for="product_code">Kód produktu</label>
-            <input id="product_code" type="text" name="product_code" placeholder="Kód produktu">
-        </div>
+    <label>Kód produktu</label>
+    <input type="text" name="product_code">
 
-        <div class="center-btn">
-            <button type="submit" name="add">Pridať produkt</button>
-        </div>
-    </form>
-</div>
-
+    <button type="submit" name="add">Pridať produkt</button>
+</form>

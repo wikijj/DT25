@@ -1,35 +1,54 @@
 <?php
 require 'db.php';
-session_start(); // ak ešte nie je spustená session
 
-// Získanie ID z URL
-$id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
+// lokálne ID
+$id = (int)($_GET['id'] ?? 0);
+if ($id <= 0) {
+    header("Location: index.php?page=list");
+    exit;
+}
 
-// Načítať záznam
-$stmt = $pdo->prepare("SELECT * FROM records WHERE id = ?");
+// Načítanie produktu
+$stmt = $pdo->prepare("SELECT * FROM products WHERE id = ?");
 $stmt->execute([$id]);
 $product = $stmt->fetch(PDO::FETCH_ASSOC);
 
 if (!$product) {
-    $_SESSION['message'] = "Záznam neexistuje!";
     header("Location: index.php?page=list");
     exit;
 }
 
-// Kontrola autora
-if ($product['node_id'] != $node_id) {
-    $_SESSION['message'] = "Nemôžete zmazať tento produkt – nie ste autor.";
+// len autor môže mazať
+if ((int)$product['node_origin'] !== (int)$node_id) {
     header("Location: index.php?page=list");
     exit;
 }
 
-// Namiesto priameho DELETE nastavíme needs_replication = 1 a deleted_at
-$stmt = $pdo->prepare("UPDATE records 
-                       SET needs_replication = 1, deleted_at = NOW() 
-                       WHERE id = ?");
+// lokálny soft delete (cez id – OK)
+$stmt = $pdo->prepare("
+    UPDATE products SET deleted_at = NOW()
+    WHERE id = ?
+");
 $stmt->execute([$id]);
 
-$_SESSION['message'] = "Produkt bol vymazaný a replikácia sa postará o odstránenie na ostatných uzloch!";
+// SQL pre replikáciu (STABILNÝ IDENTIFIKÁTOR)
+$sql = "
+UPDATE products
+SET deleted_at = NOW()
+WHERE node_origin = {$product['node_origin']}
+  AND product_code = ".$pdo->quote($product['product_code']);
+
+// zápis do replication_queue
+$nodes = [1, 2, 3];
+foreach ($nodes as $target) {
+    if ($target != $node_id) {
+        $stmt = $pdo->prepare("
+            INSERT INTO replication_queue (target_node, operation, sql_query)
+            VALUES (?, 'DELETE', ?)
+        ");
+        $stmt->execute([$target, $sql]);
+    }
+}
+
 header("Location: index.php?page=list");
 exit;
-?>

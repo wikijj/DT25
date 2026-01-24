@@ -1,25 +1,22 @@
 <?php
 require 'db.php';
 
-
-
-$node_id = 2; 
-
 // ----- Načítanie produktov -----
 $stmt = $pdo->query("
     SELECT *
-    FROM records
+    FROM products
     WHERE deleted_at IS NULL
     ORDER BY created_at DESC
 ");
 $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 
-<!-- HTML časť -->
 <h2>Zoznam produktov</h2>
 
-<?php if (isset($_SESSION['message'])): ?>
-    <p style="color: green;"><?= htmlspecialchars($_SESSION['message']) ?></p>
+<?php if (!empty($_SESSION['message'])): ?>
+    <p style="color: green;">
+        <?= htmlspecialchars($_SESSION['message']) ?>
+    </p>
     <?php unset($_SESSION['message']); ?>
 <?php endif; ?>
 
@@ -27,7 +24,7 @@ $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <thead style="background:#eee;">
         <tr>
             <th>ID</th>
-            <th>Node</th>
+            <th>Uzol</th>
             <th>Produkt</th>
             <th>Popis</th>
             <th>Počet</th>
@@ -43,7 +40,7 @@ $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
             <?php foreach ($rows as $row): ?>
                 <tr>
                     <td><?= htmlspecialchars($row['id']) ?></td>
-                    <td><?= htmlspecialchars($row['node_id']) ?></td>
+                    <td><?= htmlspecialchars($row['node_origin']) ?></td>
                     <td><?= htmlspecialchars($row['title']) ?></td>
                     <td><?= htmlspecialchars($row['description']) ?></td>
                     <td><?= htmlspecialchars($row['quantity']) ?></td>
@@ -52,19 +49,22 @@ $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     <td><?= htmlspecialchars($row['color']) ?></td>
                     <td><?= htmlspecialchars($row['product_code']) ?></td>
                     <td>
-                        <!-- EDIT -->
                         <a href="edit.php?id=<?= $row['id'] ?>">✏️</a>
-                        <!-- DELETE (len ak node_id zodpovedá aktuálnemu uzlu) -->
-                        <?php if ($row['node_id'] == $node_id): ?>
+
+                        <?php if ((int)$row['node_origin'] === (int)$node_id): ?>
                             <a href="delete.php?id=<?= $row['id'] ?>"
-                               onclick="return confirm('Naozaj zmazať tento záznam?');">🗑️</a>
+                               onclick="return confirm('Naozaj zmazať tento produkt?');">
+                                🗑️
+                            </a>
                         <?php endif; ?>
                     </td>
                 </tr>
             <?php endforeach; ?>
         <?php else: ?>
             <tr>
-                <td colspan="10" style="text-align:center; opacity:0.7;">Žiadne produkty</td>
+                <td colspan="10" style="text-align:center; opacity:0.7;">
+                    Žiadne produkty
+                </td>
             </tr>
         <?php endif; ?>
     </tbody>
