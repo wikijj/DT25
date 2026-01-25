@@ -8,9 +8,9 @@ require 'db.php';
 | Uprav URL podľa reálnej IP / domény jednotlivých uzlov
 */
 $nodes = [
-    1 => 'http://25.26.138.185/mojprojekt/replicate.php?receive=1',
-    2 => 'http://node2.local/mojprojekt/replicate.php?receive=1',
-    3 => 'http://node3.local/mojprojekt/replicate.php?receive=1',
+//    1 => 'http://25.26.138.185/mojprojekt/replicate.php?receive=1',
+      2 => 'http://25.56.188.24/mojprojekt/replicate.php?receive=1',
+//    3 => 'http://node3.local/mojprojekt/replicate.php?receive=1',
 ];
 
 /*
