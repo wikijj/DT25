@@ -10,7 +10,7 @@ require 'db.php';
 $nodes = [
 //    1 => 'http://25.26.138.185/mojprojekt/replicate.php?receive=1',
       2 => 'http://25.56.188.24/mojprojekt/replicate.php?receive=1',
-//    3 => 'http://node3.local/mojprojekt/replicate.php?receive=1',
+      3 => 'http://25.5.25.66/mojprojekt/replicate.php?receive=1',
 ];
 
 /*

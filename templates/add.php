@@ -1,7 +1,6 @@
 <?php
 require 'db.php';
 
-// --- SPRACOVANIE PRIDANIA PRODUKTU ---
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add'])) {
 
     $title        = $_POST['title'];
@@ -12,58 +11,73 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add'])) {
     $color        = $_POST['color'];
     $product_code = $_POST['product_code'];
 
-    // 1️⃣ Lokálny INSERT
-    $stmt = $pdo->prepare("
-        INSERT INTO products
-        (title, description, quantity, price, size, color, product_code, node_origin)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-    ");
-    $stmt->execute([
-        $title,
-        $description,
-        $quantity,
-        $price,
-        $size,
-        $color,
-        $product_code,
-        $node_id
-    ]);
-
-    // 2️⃣ SQL pre replikáciu (ESCAPED!)
-    $sql = "
-        INSERT INTO products
-        (title, description, quantity, price, size, color, product_code, node_origin)
-        VALUES (
-            ".$pdo->quote($title).",
-            ".$pdo->quote($description).",
+    try {
+        // 1️⃣ Lokálny INSERT
+        $stmt = $pdo->prepare("
+            INSERT INTO products
+            (title, description, quantity, price, size, color, product_code, node_origin)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        ");
+        $stmt->execute([
+            $title,
+            $description,
             $quantity,
             $price,
-            ".$pdo->quote($size).",
-            ".$pdo->quote($color).",
-            ".$pdo->quote($product_code).",
+            $size,
+            $color,
+            $product_code,
             $node_id
-        )
-    ";
+        ]);
 
-    // zoznam uzlov
-    $nodes = [1, 2, 3];
+        // 2️⃣ SQL pre replikáciu
+        $sql = "
+            INSERT INTO products
+            (title, description, quantity, price, size, color, product_code, node_origin)
+            VALUES (
+                ".$pdo->quote($title).",
+                ".$pdo->quote($description).",
+                $quantity,
+                $price,
+                ".$pdo->quote($size).",
+                ".$pdo->quote($color).",
+                ".$pdo->quote($product_code).",
+                $node_id
+            )
+        ";
 
-    foreach ($nodes as $target_node) {
-        if ($target_node != $node_id) {
-            $stmt = $pdo->prepare("
-                INSERT INTO replication_queue
-                (target_node, operation, sql_query)
-                VALUES (?, 'INSERT', ?)
-            ");
-            $stmt->execute([$target_node, $sql]);
+        $nodes = [1, 2, 3];
+        foreach ($nodes as $target_node) {
+            if ($target_node != $node_id) {
+                $stmt = $pdo->prepare("
+                    INSERT INTO replication_queue
+                    (target_node, operation, sql_query)
+                    VALUES (?, 'INSERT', ?)
+                ");
+                $stmt->execute([$target_node, $sql]);
+            }
         }
-    }
 
-    $_SESSION['message'] = "Produkt bol pridaný a zaradený do replikácie.";
-    header("Location: ?page=list");
-    exit;
+        $_SESSION['message'] = "Produkt bol úspešne pridaný a zaradený do replikácie.";
+        header("Location: ?page=list");
+        exit;
+
+    } catch (PDOException $e) {
+
+        // 🔴 DUPLICITA (UNIQUE constraint)
+        if ($e->getCode() === '23000') {
+            $_SESSION['message'] = "❗ Produkt s týmto kódom už bol na tomto uzle pridaný.";
+            header("Location: ?page=add");
+            exit;
+        }
+
+        // 🔴 Iná DB chyba
+        $_SESSION['message'] = "❌ Nastala chyba pri ukladaní produktu.";
+        header("Location: ?page=add");
+        exit;
+    }
 }
 ?>
+
 
 <h2>Pridať nový produkt</h2>
 
